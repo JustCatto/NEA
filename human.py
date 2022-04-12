@@ -1,6 +1,7 @@
 from player import Player
 import replit
 import time
+import constants
 
 class Human(Player):
   

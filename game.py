@@ -3,6 +3,7 @@ import human
 import board
 import constants
 import replit
+import pickle
 
 class Game:
   def __init__(self):
@@ -20,7 +21,7 @@ class Game:
     f.close()
   def _checkIfFileExists(self,file):
     try:
-      f = open(file,x)
+      f = open(file,"x")
       return False
     except FileExistsError:
       return True
@@ -133,7 +134,7 @@ class Game:
     self._initialisePlayer2(self._askForPlayerChoice("2"))
     self._playGame()
     
-  def _loadGame(self):
+  def _loadGame(self,fileName):
     self._loadDict(fileName)
     self._playGame()
   def mainMenu(self):

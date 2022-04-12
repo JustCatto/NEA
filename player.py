@@ -1,5 +1,6 @@
 import constants
 import copy
+import globalfunctions
 class Player:
 
   def __init__(self,playerName,assignedPiece):
@@ -21,14 +22,14 @@ class Player:
     elif color == constants.WHITE:
       return constants.BLACK
     else:
-      reportError(0)
+      globalfunctions.reportError(0)
 
   def _getPossibleMoves(self,othelloBoard,Friendly):
     if Friendly == True:
       piece = self.assignedPiece
       oppositePiece = self._swapColor(self.assignedPiece)
     else:
-      piece = _swapColor(self.assignedPiece)
+      piece = self._swapColor(self.assignedPiece)
       oppositePiece = self.assignedPiece
     offsets = constants.OFFSETS
     possibleMoves = []
