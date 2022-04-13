@@ -1,6 +1,7 @@
 import constants 
 import copy
 import stack
+import globalfunctions
 class Board:
   def __init__(self):
     self.othelloBoard = []
@@ -8,29 +9,29 @@ class Board:
     self.nextMove = constants.BLANK
     self.undoRedoMoves = stack.Stack()
 
-  def swapColor(self,color):
+  def _swapColor(self,color):
     if color == constants.BLACK:
       return constants.WHITE
     elif color == constants.WHITE:
       return constants.BLACK
     else:
-      reportError(0)
+      globalfunctions.reportError(0)
 
   def generateBoard(self): 
     self.othelloBoard = [[constants.BLANK for x in range(8)]for y in range(8)] 
     self.piece = constants.BLACK
     for x in range(2):
-      self.piece = self.swapColor(self.piece) 
+      self.piece = self._swapColor(self.piece) 
       for y in range(2):
         self.othelloBoard[y+3][x+3] = self.piece 
-        self.piece = self.swapColor(self.piece) 
+        self.piece = self._swapColor(self.piece) 
     self.nextMove = constants.WHITE
 
   def placePiece(self,x,y,piece):
     flipPieces = []
     offsets = constants.OFFSETS
     self.othelloBoard[y][x] = piece
-    oppositePiece = self.swapColor(piece)
+    oppositePiece = self._swapColor(piece)
     self.undoRedoMoves.pushCoordinates(x,y,piece)
     for offset in offsets:
       overallOffset = copy.copy(offset)
@@ -53,15 +54,16 @@ class Board:
           overallOffset[0] += offset[0]
 
   def undoMove(self):
+    flipPieces = []
     Coordinate = self.undoRedoMoves.getUndoCoordinate()
     if Coordinate == False:
       print("Unable to undo move, no moves left to undo.")
       return False
-    offsets = constant.OFFSETS
+    offsets = constants.OFFSETS
     pieceX = Coordinate[0]
     pieceY = Coordinate[1]
     pieceColor = Coordinate[2]
-    oppositePieceColor = swapColor(pieceColor)
+    oppositePieceColor = self._swapColor(pieceColor)
     self.othelloBoard[pieceY][pieceX] = constants.BLANK
     for offset in offsets:
       overallOffset = copy.copy(offset)
@@ -76,7 +78,7 @@ class Board:
         elif pieceToCheck == oppositePieceColor:
           flipPieces.pop()
           for piece in flipPieces:
-            self.othelloBoard[piece[1]][piece[0]] = oppositePiece
+            self.othelloBoard[piece[1]][piece[0]] = oppositePieceColor
         elif pieceToCheck == constants.BLANK:
           break
         else:
@@ -86,7 +88,7 @@ class Board:
   def redoMove(self):
     Coordinate = self.undoRedoMoves.getRedoMoveCoordinates()
     if Coordinate != False:
-      placePiece(Coordinate[0],Coordinate[1],Coordinate[2])
+      self.placePiece(Coordinate[0],Coordinate[1],Coordinate[2])
       return Coordinate[2]
     else:
       print("Unable to redo move, no moves left to redo.")
@@ -99,4 +101,4 @@ class Board:
     return self.nextMove
 
   def flipNextMove(self):
-    self.nextMove = self.swapColor(self.nextMove)
+    self.nextMove = self._swapColor(self.nextMove)

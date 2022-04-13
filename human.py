@@ -59,6 +59,9 @@ class Human(Player):
   
   def getMove(self,othelloBoard):
     possibleMoves = self._getPossibleMoves(othelloBoard,True)
+    if possibleMoves == []:
+      print("No possible moves for player-",self.playerName,"'s turn.")
+      return False
     while True:
       print("It is",self.playerName,"'s turn.'")
       self._printBoard(othelloBoard)

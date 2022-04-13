@@ -25,7 +25,7 @@ class AI(Player):
         checkX = x +overallOffset[0]
         if checkY not in range(0,constants.BOARDY) or checkX not in range(0,constants.BOARDX):
           break
-        pieceToCheck = self.othelloBoard[checkY][checkX]
+        pieceToCheck = othelloBoard[checkY][checkX]
         if pieceToCheck == piece:
           for flipPiece in flipPieces:
             self.othelloBoard[flipPiece[1]][flipPiece[0]] = piece
@@ -50,7 +50,7 @@ class AI(Player):
     elif mode == True:
       for x in range(constants.BOARDX):
         for y in range(constants.BOARDY):
-          piecescan = othelloBoard[y][x]
+          pieceScan = othelloBoard[y][x]
           spotValue = constants.VALUEBOARD[y][x]
           if pieceScan == constants.WHITE:
             score += spotValue
@@ -60,13 +60,13 @@ class AI(Player):
 
   def _minimax(self,othelloBoard,move,depth,maximising,alpha,beta,mode):
     newBoard = self._simulatePlacePiece(othelloBoard,move)
-    possibleMoves = _getPossibleMoves(newBoard)
+    possibleMoves = self._getPossibleMoves(newBoard)
     if depth == 0 or possibleMoves == []:
-      _calculateHeuristic(newBoard,mode)
+      self._calculateHeuristic(newBoard,mode)
     if maximising == True:
       maxHeuristic = -constants.infinity
       for possibleMove in possibleMoves:
-        heuristic = _minimax(self,newBoard,possibleMove,depth-1,False,alpha,beta)
+        heuristic = self._minimax(self,newBoard,possibleMove,depth-1,False,alpha,beta)
         if heuristic > maxHeuristic:
           maxHeuristic = copy.copy(heuristic)
         if maxHeuristic <= beta:
@@ -76,7 +76,7 @@ class AI(Player):
     else:
       minHeuristic = +constants.infinity
       for possibleMove in possibleMoves:
-        heuristic = _minimax(self,newBoard,possibleMove,depth-1,True,alpha,beta)
+        heuristic = self._minimax(self,newBoard,possibleMove,depth-1,True,alpha,beta)
         if heuristic < minHeuristic:
           minHeuristic = copy.copy(heuristic)
         if minHeuristic <= alpha:
@@ -105,8 +105,8 @@ class AI(Player):
     optimalMove = []
     for possibleMove in possibleMoves:
       othelloBoardTest = copy.deepcopy(othelloBoard)
-      othelloBoardTest = _simulatePlacePiece(othelloBoardtest,x,y,self.assignedPiece)
-      moveValue = _calculateHeuristic(othelloBoardTest,False)
+      othelloBoardTest = self._simulatePlacePiece(othelloBoardTest,possibleMove[0],possibleMove[1],self.assignedPiece)
+      moveValue = self._calculateHeuristic(othelloBoardTest,True)
       if moveValue > maxMoveValue:
         optimalMove = possibleMove
         maxMoveValue = moveValue
@@ -119,8 +119,12 @@ class AI(Player):
     return self.minimaxInitialCall(othelloBoard,possibleMoves,True)
 
   def getMove(self,othelloBoard):
+    possibleMoves = []
     print("It is AI-",self.playerName,"'s turn.")
     possibleMoves = self._getPossibleMoves(othelloBoard,True)
+    if possibleMoves == []:
+      print("No possible moves to take.")
+      return False
     if self.AIDifficulty == "e":
       return self._easyAIMove(possibleMoves)
     elif self.AIDifficulty == "m":
