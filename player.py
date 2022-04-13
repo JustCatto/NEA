@@ -16,6 +16,14 @@ class Player:
           coordinateList.append([x,y])
     return coordinateList
 
+  def getTotalPieces(self,othelloBoard):
+    totalPieces = 0
+    for x in range(constants.BOARDX):
+      for y in range(constants.BOARDY):
+        if othelloBoard[y][x] == self.assignedPiece:
+          totalPieces += 1
+    return totalPieces
+
   def _swapColor(self,color):
     if color == constants.BLACK:
       return constants.WHITE

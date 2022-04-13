@@ -4,6 +4,8 @@ import board
 import constants
 import replit
 import pickle
+import globalfunctions
+import time
 
 class Game:
   def __init__(self):
@@ -103,55 +105,61 @@ class Game:
         self._setNextMove(status)
       else:
         pass
+    elif condition == "x":
+      print("Game exiting.")
+    else:
+      globalfunctions.reportError(0)
         
   def _checkWinner(self):
-    whitePieces = self.player1.getTotalPieces
-    blackPieces = self.player2.getTotalPieces
+    whitePieces = self.player1.getTotalPieces(self.othelloBoard.getBoard())
+    blackPieces = self.player2.getTotalPieces(self.othelloBoard.getBoard())
     if whitePieces > blackPieces:
-      print(constants.winConditions("O"))
+      print(constants.winConditions[constants.WHITE])
     elif whitePieces == blackPieces:
-      print(constants.winConditions("-"))
+      print(constants.winConditions[constants.BLANK])
     elif whitePieces < blackPieces:
-      print(constants.winCondtions("X"))
+      print(constants.winCondtions[constants.BLACK])
     pass
 
   def _playGame(self):
+    outOfMoves = False
     while True:
-      enemyOutOfMoves = False
       if self.nextTurn == True:
         move = self.player1.getMove(self.othelloBoard.getBoard())
         if move == False:
-          if enemyOutOfMoves == True:
+          if outOfMoves == True:
             print("Game Over, Both players have no valid moves remaining.")
             self._checkWinner()
-          enemyOutOfMoves = True
+            break
+          outOfMoves = True
           self.nextTurn = False
         else:
-          enemyOutOfMoves = False
-        if move in ["s","u","r"]:
-          self._dealWithSpecialCondition(move)
-        if move in ["x","s"]:
-          break
-        else:
-          self.othelloBoard.placePiece(move[0],move[1],move[2])
-          self.nextTurn = False
+          outOfMoves = False
+          if move in ["s","u","r","x"]:
+            self._dealWithSpecialCondition(move)
+            if move in ["x","s"]:
+              break
+          else:
+            self.othelloBoard.placePiece(move[0],move[1],move[2])
+            self.nextTurn = False
       elif self.nextTurn == False:
         move = self.player2.getMove(self.othelloBoard.getBoard())
         if move == False:
-          if enemyOutOfMoves == True:
+          if outOfMoves == True:
             print("Game over, both players have no valid moves remaining.")
             self._checkWinner()
-          enemyOutOfMoves = True
+            break
+          outOfMoves = True
           self.nextTurn = True
         else:
-          enemyOutOfMoves = False
-        if move in ["s","u","r"]:
-          self._dealWithSpecialCondition(move)
-        if move in ["s","x"]:
-          break
-        else:
-          self.othelloBoard.placePiece(move[0],move[1],move[2])
-          self.nextTurn = True
+          outOfMoves = False
+          if move in ["s","u","r"]:
+            self._dealWithSpecialCondition(move)
+          if move in ["s","x"]:
+            break
+          else:
+            self.othelloBoard.placePiece(move[0],move[1],move[2])
+            self.nextTurn = True
           
   def _newGame(self):
     self.othelloBoard = board.Board()
