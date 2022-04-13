@@ -19,6 +19,7 @@ class Game:
     f = open(fileName,"wb")
     pickle.dump(__dict__,f,2)
     f.close()
+
   def _checkIfFileExists(self,file):
     try:
       f = open(file,"x")
@@ -59,7 +60,6 @@ class Game:
     else:
       self.player1 = AI.AI(constants.WHITE,self._askForAIDifficulty())
       
-
   def _initialisePlayer2(self,humanPlayer):
     if humanPlayer == True:
       name = input("Please enter player 2's Name \n--->")
@@ -103,13 +103,31 @@ class Game:
         self._setNextMove(status)
       else:
         pass
-    
-      
-      
+        
+  def _checkWinner(self):
+    whitePieces = self.player1.getTotalPieces
+    blackPieces = self.player2.getTotalPieces
+    if whitePieces > blackPieces:
+      print(constants.winConditions("O"))
+    elif whitePieces == blackPieces:
+      print(constants.winConditions("-"))
+    elif whitePieces < blackPieces:
+      print(constants.winCondtions("X"))
+    pass
+
   def _playGame(self):
     while True:
+      enemyOutOfMoves = False
       if self.nextTurn == True:
         move = self.player1.getMove(self.othelloBoard.getBoard())
+        if move == False:
+          if enemyOutOfMoves == True:
+            print("Game Over, Both players have no valid moves remaining.")
+            self._checkWinner()
+          enemyOutOfMoves = True
+          self.nextTurn = False
+        else:
+          enemyOutOfMoves = False
         if move in ["s","u","r"]:
           self._dealWithSpecialCondition(move)
         if move in ["x","s"]:
@@ -119,6 +137,14 @@ class Game:
           self.nextTurn = False
       elif self.nextTurn == False:
         move = self.player2.getMove(self.othelloBoard.getBoard())
+        if move == False:
+          if enemyOutOfMoves == True:
+            print("Game over, both players have no valid moves remaining.")
+            self._checkWinner()
+          enemyOutOfMoves = True
+          self.nextTurn = True
+        else:
+          enemyOutOfMoves = False
         if move in ["s","u","r"]:
           self._dealWithSpecialCondition(move)
         if move in ["s","x"]:
@@ -137,6 +163,7 @@ class Game:
   def _loadGame(self,fileName):
     self._loadDict(fileName)
     self._playGame()
+
   def mainMenu(self):
     while True:
       print("Othello Game version-",self.Version)
