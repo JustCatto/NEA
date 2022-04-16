@@ -44,9 +44,10 @@ class AI(player.Player): #The player class inherits the player classes methods a
     if mode == False: #If the mode is set to false, do not use the spotValue 2D array and instead add/subtract one whenever either white or black piece is found.
       for x in range(constants.BOARDX):
         for x in range(constants.BOARDY):
-          if piece == constants.WHITE:
+          pieceScan = othelloBoard[y][x]
+          if pieceScan == constants.WHITE:
             score += 1
-          elif piece == constants.BLACK:
+          elif pieceScan == constants.BLACK:
             score -= 1
     elif mode == True: #If the mode is set to true, use the spotValue 2D array and add/subtract the value in the same coordinates as the found piece/
       for x in range(constants.BOARDX):
