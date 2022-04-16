@@ -10,110 +10,111 @@ import time
 class Game:
   def __init__(self):
     self.Version = 1.4
-    self.nextTurn = True #True for whites move, false for blacks move. This is stored so that when the functions __dict__ is updated, it knows whos turn it should be next.
-  def _loadDict(self,fileName):
-    f = open(fileName,"rb")
-    temp = pickle.load(f)
-    f.close()
-    self.__dict__.update(temp)
 
-  def _saveDict(self,fileName):
-    f = open(fileName,"wb")
-    pickle.dump(__dict__,f,2)
-    f.close()
+  def _loadDict(self,fileName): #Method to load and update the class dictionary to start the game again.
+    f = open(fileName,"rb") #Opens the file as binary read only mode.
+    temp = pickle.load(f) #Loads the dictionary and unpickles it
+    f.close() #Closes the file
+    self.__dict__.update(temp) #Updates the dictionary with the data from the file.
 
-  def _checkIfFileExists(self,file):
-    try:
-      f = open(file,"x")
-      return False
+  def _saveDict(self,fileName): #Method to save the class dictionary so the user can resume the game later.
+    f = open(fileName,"wb") #Opens the file as binary write only mode.
+    pickle.dump(self.__dict__,f,2) #Dumps the class dictionary in the file and pickles it.
+    f.close() #Closes the file.
+
+  def _checkIfFileExists(self,file): #Used before _saveDict to confirm the user wants to overwrite the existing file if it already exists.
+    try: #Used to handle the error that is returned when opening a file as x (exclusive creation) if it already exists.
+      f = open(file,"x") #Opens the file in mode x (exclusive creation)
+      f.close()
+      return False #If there is no error, return false as the file does not exist.
     except FileExistsError:
-      return True
+      return True #If FileExistsError is returned, return true as the file exists.
     
-  def _askForPlayerChoice(self,player):
+  def _askForPlayerChoice(self,player): #Used to ask the user if the new player should be an AI or a human.
     print("Would you like player ",player,""" to be a player or a human?
           A for AI
           H for human""")
     while True:
-      choice = input("--->").lower()
-      if choice == "a":
-        return False
+      choice = input("--->").lower() #Gets the users input and makes it lowercase.
+      if choice == "a": 
+        return False #If the choice is a, return False to indicate the player wants an AI.
       elif choice == "h":
-        return True
+        return True #If the choice is h, return True to indicate the player wants a human (local player)
       else:
-        print("Please enter either A or H.")
+        print("Please enter either A or H.") #If the user doesnt input either a or h, tell the user to input either.
 
-  def _askForAIDifficulty(self):
+  def _askForAIDifficulty(self): #Asks the user what difficulty the AI should be 
     print("""What difficulty would you like the AI to be?
           E for easy
           M for medium
           H for hard
           VH for very hard""")
-    while True:
-      choice = input("--->").lower()
-      if choice in ["e","m","h","vh"]:
-        return choice
-      else:
+    while True: #Loops as long as there hasnt been a valid AI difficulty returned.
+      choice = input("--->").lower() #takes the user input and makes it lowercase.
+      if choice in ["e","m","h","vh"]: #If the user input is any valid difficulty, return it.
+        return choice 
+      else: #If the user input is not a valid difficulty, notify the user and ask them to type in the difficulty again.
         print("Invalid- Please enter one of the displayed options.")
     
-  def _initialisePlayer1(self,humanPlayer):
-    if humanPlayer == True:
+  def _initialisePlayer1(self,humanPlayer): #Initialises the WHITE player/Player 1 class.
+    if humanPlayer == True: #If humanplayer is true, ask for the players name and start an instance of the human class assigning it the WHITE piece.
       name = input("Please enter player 1's Name \n--->")
       self.player1 = human.Human(name,constants.WHITE)
-    else:
+    else: #Otherwise, start an instance of the AI class as the white piece and ask the user for its difficulty. The name is auto generated as the class initialises.
       self.player1 = AI.AI(constants.WHITE,self._askForAIDifficulty())
       
-  def _initialisePlayer2(self,humanPlayer):
+  def _initialisePlayer2(self,humanPlayer): #Does the same as _initialisePlayer1, however instead for player 2.
     if humanPlayer == True:
       name = input("Please enter player 2's Name \n--->")
       self.player2 = human.Human(name,constants.BLACK)
     else:
       self.player2 = AI.AI(constants.BLACK,self._askForAIDifficulty())
 
-  def _saveGame(self):
-    while True:
-      fileName = input("Please enter a name for your save file.")
-      if self._checkIfFileExists(fileName) == True:
-        overwrite = input("Would you like to overwite the file? [Y/N]").lower()
-        if overwrite == "y":
+  def _saveGame(self): #Method that gets the user input for the name of the savefile.
+    while True: #Only breaks the loop once the game class has been successfully saved.
+      fileName = input("Please enter a name for your save file.") #Asks for the user input for the files name.
+      if self._checkIfFileExists(fileName) == True: #Checks if the file exists, if not just saves the file.
+        overwrite = input("Would you like to overwite the file? [Y/N]").lower() #Changes the user input to lowercase and asks if they are sure.
+        if overwrite == "y": #if y, overwrite the file.
           self._saveDict(fileName)
           break
-        elif overwrite == "n":
+        elif overwrite == "n": #If no, the loop is repeated again.
           pass
         else:
-          print("Please enter either Y or N.")
+          print("Please enter either Y or N.") #If neither condition is met, notify the user that they must input either Y or N.
+      elif self._checkIfFileExists(fileName) == False:
+        self._saveDict(fileName)
 
-  def _setNextMove(self,color):
-    if color == constants.WHITE:
+  def _setNextMove(self,color): #Used if a move is undone or redone to override the next move.
+    if color == constants.WHITE: #If the color input is white, set the turn to WHITE. (True)
       self.nextTurn = True
-    elif color == constants.BLACK:
+    elif color == constants.BLACK: #If the color input is black, set the turn to BLACK. (False)
       self.nextTurn = False
-    else:
+    else: #In the event that there is an incorrect variable input, return false to signify an error.
+      globalfunctions.reportError(0)
       return False
       
-  def _dealWithSpecialCondition(self,condition):
+  def _dealWithSpecialCondition(self,condition): #Method to deal with special conditions such as saving the game, undoing or redoing a move.
     if condition == "s":
-      self._saveGame()
+      self._saveGame() #Calls the saveGame method to save the game dictionary before the game ends.
     elif condition == "r":
-      status = board.redoMove()
-      if status != False:
-        self._setNextMove(status)
-      else:
-        pass  
+      board.redoMove()  #if the move is redone, the turn is not changed as it will still be the same players turn.
     elif condition == "u":
       status = board.undoMove()
       if status != False:
-        self._setNextMove(status)
+        self._setNextMove(status) #If the move is undone, the turn is set to the value of the undone move.
       else:
         pass
     elif condition == "x":
       print("Game exiting.")
-    else:
+    else: #If none of the conditions are met, return an error to the user.
       globalfunctions.reportError(0)
+      return False
         
-  def _checkWinner(self):
-    whitePieces = self.player1.getTotalPieces(self.othelloBoard.getBoard())
+  def _checkWinner(self): #Checks the winner by getting the total amount of WHITE and BLACK pieces.
+    whitePieces = self.player1.getTotalPieces(self.othelloBoard.getBoard()) 
     blackPieces = self.player2.getTotalPieces(self.othelloBoard.getBoard())
-    if whitePieces > blackPieces:
+    if whitePieces > blackPieces: #Whoever has the most pieces is declared the winner.
       print(constants.winConditions[constants.WHITE])
     elif whitePieces == blackPieces:
       print(constants.winConditions[constants.BLANK])
@@ -121,29 +122,29 @@ class Game:
       print(constants.winCondtions[constants.BLACK])
     pass
 
-  def _playGame(self):
-    outOfMoves = False
-    while True:
-      if self.nextTurn == True:
-        move = self.player1.getMove(self.othelloBoard.getBoard())
-        if move == False:
-          if outOfMoves == True:
+  def _playGame(self): #The method to play the game until it ends.
+    outOfMoves = False #Initialises the variable to indicate if the enemy player does not have any moves.
+    while True: #Loop that breaks when the game is over, or if the game is exited or saved.
+      if self.nextTurn == True: #If the turn is true, it is player 1's turn.
+        move = self.player1.getMove(self.othelloBoard.getBoard()) #Gets the move for player 1.
+        if move == False: #If the move from player 1 is false, this indicates there are no available moves for them.
+          if outOfMoves == True: #If outOfMoves is true, this means that the enemy is also out of moves.
             print("Game Over, Both players have no valid moves remaining.")
-            self._checkWinner()
+            self._checkWinner() #This results in the games winner being checked and the loop being broken to end the game.
             break
-          outOfMoves = True
-          self.nextTurn = False
+          outOfMoves = True #If the enemy had moves last turn, indicate that one player is out of moves.
+          self.nextTurn = False #Set the turn to the enemies turn.
         else:
-          outOfMoves = False
-          if move in ["s","u","r","x"]:
+          outOfMoves = False #If the user makes a move, set the condition to
+          if move in ["s","u","r","x"]: #If the move is any of the special conditions, call the method to deal with it.
             self._dealWithSpecialCondition(move)
-            if move in ["x","s"]:
+            if move in ["x","s"]: #if the move is to exit or save the game, break the while True loop to end the game.
               break
           else:
-            self.othelloBoard.placePiece(move[0],move[1],move[2])
-            self.nextTurn = False
-      elif self.nextTurn == False:
-        move = self.player2.getMove(self.othelloBoard.getBoard())
+            self.othelloBoard.placePiece(move[0],move[1],move[2]) #If the move is not false or a special condition, attempt to place a piece on the board.
+            self.nextTurn = False #Set the turn to BLACK.
+      elif self.nextTurn == False: #If the turn is False, it is BLACK (player 2's) turn.
+        move = self.player2.getMove(self.othelloBoard.getBoard()) #Same as above except for player 2.
         if move == False:
           if outOfMoves == True:
             print("Game over, both players have no valid moves remaining.")
@@ -161,18 +162,19 @@ class Game:
             self.othelloBoard.placePiece(move[0],move[1],move[2])
             self.nextTurn = True
           
-  def _newGame(self):
-    self.othelloBoard = board.Board()
+  def _newGame(self): #Used to start the game using a blank board.
+    self.nextTurn = True #True for whites move, false for blacks move. This is stored so that when the functions __dict__ is updated, it knows whos turn it should be next.
+    self.othelloBoard = board.Board() #Initialises the board class and generates the board.
     self.othelloBoard.generateBoard()
-    self._initialisePlayer1(self._askForPlayerChoice("1"))
+    self._initialisePlayer1(self._askForPlayerChoice("1")) #Initialses both player 1 and 2.
     self._initialisePlayer2(self._askForPlayerChoice("2"))
-    self._playGame()
-    
-  def _loadGame(self,fileName):
-    self._loadDict(fileName)
-    self._playGame()
+    self._playGame() #Plays the game.
 
-  def mainMenu(self):
+  def _loadGame(self,fileName):
+    self._loadDict(fileName) #Updates the class dictionary.
+    self._playGame() #Starts the game
+
+  def mainMenu(self): #Prints the main menu for the user and hosts the game itself.
     while True:
       print("Othello Game version-",self.Version)
       print("""
@@ -182,12 +184,12 @@ class Game:
       3- Exit Game
       """)
       while True:
-        decision = input("Please enter your choice (1,2,3)\n--->")
+        decision = input("Please enter your choice (1,2,3)\n--->") #Accepts the users input for what they want to do.
         if decision in ["1","2","3"]:
           break
         else:
           print("Invalid option, please try again.")
-      if decision == "1":
+      if decision == "1": #If it is 1, starts a new game, if 2, loads a game from the existing file, and the 3rd stops the loop.
         replit.clear()
         self._newGame()
       elif decision == "2":
