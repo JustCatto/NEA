@@ -119,7 +119,7 @@ class Game:
     elif whitePieces == blackPieces:
       print(constants.winConditions[constants.BLANK])
     elif whitePieces < blackPieces:
-      print(constants.winCondtions[constants.BLACK])
+      print(constants.winConditions[constants.BLACK])
     pass
 
   def _playGame(self): #The method to play the game until it ends.
