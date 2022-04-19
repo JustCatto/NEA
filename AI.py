@@ -2,7 +2,7 @@ import player #Imports the player class to be inherited by the AI class.
 import constants #Imports the constants class to be used for comparisons.
 import random #Imports the random module to be used for picking a random name for the AI and for some of the AI difficulties.
 import copy #Imports the copy module.
-
+import time #Temporary module to slow down the AI moves.
 class AI(player.Player): #The player class inherits the player classes methods and atributes.
 
   def __init__(self,assignedPiece,AIDifficulty): #When the AI class is initialised, it needs the assigned piece (if it is player 1 or 2) and the difficulty.
@@ -43,7 +43,7 @@ class AI(player.Player): #The player class inherits the player classes methods a
     score = 0 #Score always starts at 0. (Tie)
     if mode == False: #If the mode is set to false, do not use the spotValue 2D array and instead add/subtract one whenever either white or black piece is found.
       for x in range(constants.BOARDX):
-        for x in range(constants.BOARDY):
+        for y in range(constants.BOARDY):
           pieceScan = othelloBoard[y][x]
           if pieceScan == constants.WHITE:
             score += 1
@@ -58,15 +58,20 @@ class AI(player.Player): #The player class inherits the player classes methods a
             score += spotValue
           elif pieceScan == constants.BLACK:
             score -= spotValue
+    print(score," Board Score")
     return score #At the end, once the heuristic of the board has been found, return it.
 
   def _minimax(self,othelloBoard,move,depth,maximising,alpha,beta,mode): #The minimax function that is used to calculate the best possible score the player can achieve in x moves (The depth)
-    newBoard = self._simulatePlacePiece(othelloBoard,move) #Simulates the piece being placed on a board.
-    possibleMoves = self._getPossibleMoves(newBoard) #Gets the new possible moves after the piece has been simulated being placed on the board.
+    if maximising == True:
+      color = self.assignedPiece
+    else:
+      color = self._swapColor(self.assignedPiece)
+    newBoard = self._simulatePlacePiece(othelloBoard,move[0],move[1],color) #Simulates the piece being placed on a board.
+    possibleMoves = self._getPossibleMoves(newBoard,maximising) #Gets the new possible moves after the piece has been simulated being placed on the board.
     if depth == 0 or possibleMoves == []: #If the depth is 0 or there are no possible moves remaining, calculate the heuristic of the board and stop searching downward.
       self._calculateHeuristic(newBoard,mode)
     if maximising == True: #If maximising is true, search for the highest heuristic possible out of all possible moves.
-      maxHeuristic = -constants.infinity #Set the maximum to negative infinity so that no matter what, the first heuristic returned will always override this as it will always be higher.
+      maxHeuristic = -constants.INFINITY #Set the maximum to negative infinity so that no matter what, the first heuristic returned will always override this as it will always be higher.
       for possibleMove in possibleMoves: #Cycles through all possible moves.
         heuristic = self._minimax(self,newBoard,possibleMove,depth-1,False,alpha,beta) #Call the minimax function again with the possibleMove, passing through all other variables except lowering the depth by one and setting the maximising to False.
         if heuristic > maxHeuristic: #If the heuristic is higher than the maximum, replace the maxheuristic with the heuristic.
@@ -76,7 +81,7 @@ class AI(player.Player): #The player class inherits the player classes methods a
         alpha = max(alpha,maxHeuristic) #Set the alpha to the max of itself and the maxHeuristic
       return maxHeuristic
     else: #Otherwise, if maximising is false, search for the lowest heuristic possible out of all possible moves.
-      minHeuristic = +constants.infinity #Set the minimum to infinity so that no matter what, the first heuristic returned will always override this as it will always be lower.
+      minHeuristic = +constants.INFINITY #Set the minimum to infinity so that no matter what, the first heuristic returned will always override this as it will always be lower.
       for possibleMove in possibleMoves: #Cycles through all possible moves.
         heuristic = self._minimax(self,newBoard,possibleMove,depth-1,True,alpha,beta) #Call the minimax function again with the possibleMove, passing through all other variables except lowering the depth by one and setting the maximising to True.
         if heuristic < minHeuristic: #if the heuristic found less than minHeuristic, replace it with the heuristic.
@@ -93,6 +98,7 @@ class AI(player.Player): #The player class inherits the player classes methods a
       if heuristic > minHeuristic: #If the heuristic returned by the minimax function is higher than the minimum, set the minimum to the current moves heuristic, and the optimal move to the possibleMove.
         minHeuristic = copy.copy(heuristic)
         optimalMove = copy.copy(possibleMove)
+    optimalMove.append(self.assignedPiece)
     return optimalMove #Once all possible moves have been checked, return the optimalMove.
     
   def _easyAIMove(self,possibleMoves): #Easy AI, picks a random move from the possibleMoves list.
@@ -102,14 +108,21 @@ class AI(player.Player): #The player class inherits the player classes methods a
 
   def _mediumAIMove(self,othelloBoard,possibleMoves): #Medium AI, picks the move that returns the board with the highest heuristic
     maxMoveValue = -constants.INFINITY
+    minMoveValue = +constants.INFINITY
     optimalMove = []
     for possibleMove in possibleMoves: #Cycles through all the possible moves.
       othelloBoardTest = copy.deepcopy(othelloBoard) #Makes a copy of the original board to be used for the _simulatePlacePiece method.
       othelloBoardTest = self._simulatePlacePiece(othelloBoardTest,possibleMove[0],possibleMove[1],self.assignedPiece) #Simulates the possibleMove and returns the board after the move was made.
-      moveValue = self._calculateHeuristic(othelloBoardTest,True) #Returns the heuristic of the board after the move was made.
-      if moveValue > maxMoveValue: #If the heuristic of the board is higher than the maximum heuristic encountered, replace the optimalMove with that move and the maxMoveValue with the moveValue.
-        optimalMove = possibleMove
-        maxMoveValue = moveValue
+      moveValue = self._calculateHeuristic(othelloBoardTest,False) #Returns the heuristic of the board after the move was made.
+      if self.assignedPiece == constants.WHITE:
+        if moveValue > maxMoveValue: #If the heuristic of the board is higher than the maximum heuristic encountered, replace the optimalMove with that move and the maxMoveValue with the moveValue.
+          optimalMove = possibleMove
+          maxMoveValue = moveValue
+      elif self.assignedPiece == constants.BLACK:
+        if moveValue < minMoveValue:
+          optimalMove = possibleMove
+          minMoveValue = moveValue
+    optimalMove.append(self.assignedPiece)
     return optimalMove #Once all moves have been tried, return the optimal move.
 
   def _hardAIMove(self,othelloBoard,possibleMoves): #Minimax AI
@@ -119,7 +132,9 @@ class AI(player.Player): #The player class inherits the player classes methods a
     return self._minimaxInitialCall(othelloBoard,possibleMoves,True) #Calls the minimax function with the weighted board score heuristic.
 
   def getMove(self,othelloBoard): #Called by the game class to get the AIs move based on the difficulty.
+    time.sleep(1)
     possibleMoves = []
+    self._printBoard(othelloBoard)
     print("It is AI-",self.playerName,"'s turn.")
     possibleMoves = self._getPossibleMoves(othelloBoard,True)
     if possibleMoves == []: #If there are no possible moves to take, return false. 

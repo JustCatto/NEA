@@ -17,17 +17,6 @@ class Human(player.Player): #This class is used to represent a human player.
       print("[",x,",",y,"]", end = ", ") #Prints off one of the coordinates, end = "," is to override the default so it prints on the same line.
     print("\n") #Prints a new line one all coordinates are printed.
 
-  def _printBoard(self,othelloBoard): #Used to print the current state of the board.
-    print(" ", end = " ") #Prints a blank space to compensate for the side indicators.
-    for x in range(constants.BOARDX):  
-      print(x + 1, end = " ") # #Prints out the top X indicators.
-    print(" ") 
-    for y in range(constants.BOARDY):
-      print(y + 1, end = " ") #Prints out the side Y indicators.
-      for x in range(constants.BOARDX):
-        print(othelloBoard[y][x],end = " ") #Prints out each row of the board.
-      print(" ") #Prints a new line to ensure that the next print statement isnt on the same line as the last board row.
-
   def _confirmDecision(self): #Used to confirm the users decision. Called whenever a user is asked for an input.
     while True: #Runs the loop 
       choice = input("Are you sure? (Y/N)").lower() #Asks for user input if they are sure.

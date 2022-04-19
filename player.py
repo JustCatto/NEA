@@ -8,6 +8,17 @@ class Player: #The player class, never initialised directly, instead has its met
     self.playerName = playerName
     self.assignedPiece = assignedPiece
 
+  def _printBoard(self,othelloBoard): #Used to print the current state of the board.
+    print(" ", end = " ") #Prints a blank space to compensate for the side indicators.
+    for x in range(constants.BOARDX):  
+      print(x + 1, end = " ") # #Prints out the top X indicators.
+    print(" ") 
+    for y in range(constants.BOARDY):
+      print(y + 1, end = " ") #Prints out the side Y indicators.
+      for x in range(constants.BOARDX):
+        print(othelloBoard[y][x],end = " ") #Prints out each row of the board.
+      print(" ") #Prints a new line to ensure that the next print statement isnt on the same line as the last board row.
+
   def _findPiece(self,othelloBoard,piece): #Method used to find all of one particular color on the grid and return the list with all their coordinates on it.
     coordinateList = []
     for x in range(constants.BOARDX): #Cycles through all positions on the board.
