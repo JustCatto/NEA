@@ -28,7 +28,7 @@ class AI(player.Player): #The player class inherits the player classes methods a
         pieceToCheck = othelloBoard[checkY][checkX] #Get the piece in the space in the coordinates to be searched.
         if pieceToCheck == piece: #If the piece being checked is friendly, flip all the pieces in the flipPieces list to friendly.
           for flipPiece in flipPieces:
-            self.othelloBoard[flipPiece[1]][flipPiece[0]] = piece
+            othelloBoard[flipPiece[1]][flipPiece[0]] = piece
           break
         elif pieceToCheck == constants.BLANK: #if the piece is blank, clear the list and break the loop to search in another direction.
           flipPieces = []
