@@ -135,7 +135,7 @@ class AI(player.Player): #The player class inherits the player classes methods a
     time.sleep(1)
     possibleMoves = []
     self._printBoard(othelloBoard)
-    print("It is AI-",self.playerName,"'s turn.")
+    print("It is AI-",self.playerName,"'s turn.", self.AIDifficulty, "Diff")
     possibleMoves = self._getPossibleMoves(othelloBoard,True)
     if possibleMoves == []: #If there are no possible moves to take, return false. 
       print("No possible moves to take.")
