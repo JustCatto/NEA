@@ -2,7 +2,7 @@ import player #Imports the player class to be inherited by the AI class.
 import constants #Imports the constants class to be used for comparisons.
 import random #Imports the random module to be used for picking a random name for the AI and for some of the AI difficulties.
 import copy #Imports the copy module.
-import time #Temporary module to slow down the AI moves.
+import time #Temporary module to slow down the AI moves
 class AI(player.Player): #The player class inherits the player classes methods and atributes.
 
   def __init__(self,assignedPiece,AIDifficulty): #When the AI class is initialised, it needs the assigned piece (if it is player 1 or 2) and the difficulty.
