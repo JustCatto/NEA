@@ -118,10 +118,14 @@ class AI(player.Player): #The player class inherits the player classes methods a
         if moveValue > maxMoveValue: #If the heuristic of the board is higher than the maximum heuristic encountered, replace the optimalMove with that move and the maxMoveValue with the moveValue.
           optimalMove = possibleMove
           maxMoveValue = moveValue
+        elif moveValue == maxMoveValue and random.randint(0,1) == 1: #If there are multiple moves that have the same score, have a roughly 50% chance to replace the existing move with the new move. 
+          optimalMove = possibleMove
       elif self.assignedPiece == constants.BLACK:
         if moveValue < minMoveValue:
           optimalMove = possibleMove
           minMoveValue = moveValue
+        elif moveValue == minMoveValue and random.randint(0,1) == 1: #Same with line 121.
+          optimalMove = possibleMove
     optimalMove.append(self.assignedPiece)
     return optimalMove #Once all moves have been tried, return the optimal move.
 
