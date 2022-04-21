@@ -13,7 +13,7 @@ class Game:
 
   def _loadDict(self,fileName): #Method to load and update the class dictionary to start the game again.
     f = open(fileName,"rb") #Opens the file as binary read only mode.
-    temp = pickle.load(f) #Loads the dictionary and unpickles it
+    temp = pickle.load(f) #Loads the dictionary and unpickles it.
     f.close() #Closes the file
     self.__dict__.update(temp) #Updates the dictionary with the data from the file.
 
