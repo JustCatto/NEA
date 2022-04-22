@@ -3,6 +3,7 @@ import constants #Imports the constants class to be used for comparisons.
 import random #Imports the random module to be used for picking a random name for the AI and for some of the AI difficulties.
 import copy #Imports the copy module.
 import time #Temporary module to slow down the AI moves.
+import globalfunctions
 class AI(player.Player): #The player class inherits the player classes methods and atributes.
 
   def __init__(self,assignedPiece,AIDifficulty): #When the AI class is initialised, it needs the assigned piece (if it is player 1 or 2) and the difficulty.
@@ -58,10 +59,11 @@ class AI(player.Player): #The player class inherits the player classes methods a
             score += spotValue
           elif pieceScan == constants.BLACK:
             score -= spotValue
-    print(score," Board Score")
+    #print(score," Board Score")
     return score #At the end, once the heuristic of the board has been found, return it.
 
   def _minimax(self,othelloBoard,move,depth,maximising,alpha,beta,mode): #The minimax function that is used to calculate the best possible score the player can achieve in x moves (The depth)
+    #print(alpha,beta)
     if maximising == True:
       color = self.assignedPiece
     else:
@@ -69,34 +71,40 @@ class AI(player.Player): #The player class inherits the player classes methods a
     newBoard = self._simulatePlacePiece(othelloBoard,move[0],move[1],color) #Simulates the piece being placed on a board.
     possibleMoves = self._getPossibleMoves(newBoard,maximising) #Gets the new possible moves after the piece has been simulated being placed on the board.
     if depth == 0 or possibleMoves == []: #If the depth is 0 or there are no possible moves remaining, calculate the heuristic of the board and stop searching downward.
-      self._calculateHeuristic(newBoard,mode)
+      return self._calculateHeuristic(newBoard,mode)
     if maximising == True: #If maximising is true, search for the highest heuristic possible out of all possible moves.
       maxHeuristic = -constants.INFINITY #Set the maximum to negative infinity so that no matter what, the first heuristic returned will always override this as it will always be higher.
       for possibleMove in possibleMoves: #Cycles through all possible moves.
-        heuristic = self._minimax(self,newBoard,possibleMove,depth-1,False,alpha,beta) #Call the minimax function again with the possibleMove, passing through all other variables except lowering the depth by one and setting the maximising to False.
+        newBoardCopy = copy.deepcopy(newBoard)
+        heuristic = self._minimax(newBoardCopy,possibleMove,depth-1,False,alpha,beta,mode) #Call the minimax function again with the possibleMove, passing through all other variables except lowering the depth by one and setting the maximising to False.
         if heuristic > maxHeuristic: #If the heuristic is higher than the maximum, replace the maxheuristic with the heuristic.
           maxHeuristic = copy.copy(heuristic) 
+          alpha = max(alpha,maxHeuristic) #Set the alpha to the max of itself and the maxHeuristic
         if maxHeuristic <= beta: #If the beta at any point is lower than the maxHeuristic, stop searching through all the possible moves.
           break
-        alpha = max(alpha,maxHeuristic) #Set the alpha to the max of itself and the maxHeuristic
       return maxHeuristic
     else: #Otherwise, if maximising is false, search for the lowest heuristic possible out of all possible moves.
       minHeuristic = +constants.INFINITY #Set the minimum to infinity so that no matter what, the first heuristic returned will always override this as it will always be lower.
       for possibleMove in possibleMoves: #Cycles through all possible moves.
-        heuristic = self._minimax(self,newBoard,possibleMove,depth-1,True,alpha,beta) #Call the minimax function again with the possibleMove, passing through all other variables except lowering the depth by one and setting the maximising to True.
+        newBoardCopy = copy.deepcopy(newBoard)
+        heuristic = self._minimax(newBoardCopy,possibleMove,depth-1,True,alpha,beta,mode) #Call the minimax function again with the possibleMove, passing through all other variables except lowering the depth by one and setting the maximising to True.
         if heuristic < minHeuristic: #if the heuristic found less than minHeuristic, replace it with the heuristic.
           minHeuristic = copy.copy(heuristic)
+          beta = min(beta,minHeuristic) #Set the beta to be the minimum of either itself or the minimum heuristic.
         if minHeuristic <= alpha: #If the alpha at any point is higher or equal to the minimum heuristic, stop searching through the possible moves.
           break
-        beta = min(beta,minHeuristic) #Set the beta to be the minimum of either itself or the minimum heuristic.
       return minHeuristic #Once all moves have been searched return the minimum heuristic.
 
   def _minimaxInitialCall(self,board,possibleMoves,mode): #Used to initially call the minimax function with the first set of moves. 
+    optimalMove = []
     minHeuristic = -constants.INFINITY #Initialises the minHeuristic variable as -infinity so that the first heuristic that the board returns will always override the minimum.
     for possibleMove in possibleMoves: #Cycles through all the possible moves.
-      heuristic = self._minimax(board,possibleMove,5,True,-constants.INFINITY,+constants.INFINITY,mode) #Initially calls the minimax method for each possible move.
+      boardCopy = copy.deepcopy(board)
+      heuristic = self._minimax(boardCopy,possibleMove,4,True,-constants.INFINITY,constants.INFINITY,mode) #Initially calls the minimax method for each possible move.
       if heuristic > minHeuristic: #If the heuristic returned by the minimax function is higher than the minimum, set the minimum to the current moves heuristic, and the optimal move to the possibleMove.
         minHeuristic = copy.copy(heuristic)
+        optimalMove = copy.copy(possibleMove)
+      elif heuristic == minHeuristic and random.randint(0,1) == 1:
         optimalMove = copy.copy(possibleMove)
     optimalMove.append(self.assignedPiece)
     return optimalMove #Once all possible moves have been checked, return the optimalMove.
@@ -136,7 +144,7 @@ class AI(player.Player): #The player class inherits the player classes methods a
     return self._minimaxInitialCall(othelloBoard,possibleMoves,True) #Calls the minimax function with the weighted board score heuristic.
 
   def getMove(self,othelloBoard): #Called by the game class to get the AIs move based on the difficulty.
-    time.sleep(1)
+    time.sleep(1) #The delay is added to reduce the strain on the machine if two AI's are put against each other.
     possibleMoves = []
     self._printBoard(othelloBoard)
     print("It is AI-",self.playerName,"'s turn.", self.AIDifficulty, "Diff")
@@ -153,4 +161,5 @@ class AI(player.Player): #The player class inherits the player classes methods a
     elif self.AIDifficulty == "vh":
       return self._veryHardAIMove(othelloBoard,possibleMoves)
     else:
+      globalfunctions.reportError(0)
       return False
