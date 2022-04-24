@@ -12,4 +12,6 @@ def reportError(error):
   try:
     print(constants.errorCodes[error])
   except KeyError:
-    print("Unknown error")
+    print("Unknown error-Errorcode does not exist")
+  finally:
+    print("Continuing may have unintended consequences. You are advised to shut off the program and check your savefile to avoid corruption.")

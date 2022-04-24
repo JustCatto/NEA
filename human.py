@@ -40,14 +40,15 @@ class Human(player.Player): #This class is used to represent a human player.
       try:
         x = int(input("Please enter the x coordinates (Top bar) for the space.")) - 1 #Asks the user to input the coordinates for the space they want to place down.
         y = int(input("Please enter the y coordinates (side bar) for the space.")) - 1
+      except ValueError: #If either X or Y is not an number, return an error and ask the user to input the coordinates again.
+        print("Please enter a number.")
+        time.sleep(1.5)
+      else:
         if [x,y] in possibleMoves and x in range(0,constants.BOARDX) and y in range(0,constants.BOARDY): #If the coordinates are in the possible move list,
           return [x,y,self.assignedPiece]                                                                #And in the range of the board constants, return the coordinates.
         else: 
           print("Please enter a possible move.") #If it is not a possible move, print to the user that it isnt possible and ask them to input the coordinates again.
           time.sleep(1.5)
-      except ValueError: #If either X or Y is not an number, return an error and ask the user to input the coordinates again.
-        print("Please enter a number.")
-        time.sleep(1.5)
         
   def getMove(self,othelloBoard): 
     possibleMoves = self._getPossibleMoves(othelloBoard,True) #Gets the possible moves for the current board state.

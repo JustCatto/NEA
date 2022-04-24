@@ -144,22 +144,26 @@ class AI(player.Player): #The player class inherits the player classes methods a
     return self._minimaxInitialCall(othelloBoard,possibleMoves,True) #Calls the minimax function with the weighted board score heuristic.
 
   def getMove(self,othelloBoard): #Called by the game class to get the AIs move based on the difficulty.
-    time.sleep(1) #The delay is added to reduce the strain on the machine if two AI's are put against each other.
-    possibleMoves = []
-    self._printBoard(othelloBoard)
-    print("It is AI-",self.playerName,"'s turn.", self.AIDifficulty, "Diff")
-    possibleMoves = self._getPossibleMoves(othelloBoard,True)
-    if possibleMoves == []: #If there are no possible moves to take, return false. 
-      print("No possible moves to take.")
-      return False
-    if self.AIDifficulty == "e": #Depending on the set AI difficulty, return the move that the methods return or return false if the AIDifficulty is in an invalid state.
-      return self._easyAIMove(possibleMoves)
-    elif self.AIDifficulty == "m":
-      return self._mediumAIMove(othelloBoard,possibleMoves)
-    elif self.AIDifficulty == "h":
-      return self._hardAIMove(othelloBoard,possibleMoves)
-    elif self.AIDifficulty == "vh":
-      return self._veryHardAIMove(othelloBoard,possibleMoves)
-    else:
+    try: 
+      time.sleep(1) #The delay is added to reduce the strain on the machine if two AI's are put against each other.
+      possibleMoves = []
+      self._printBoard(othelloBoard)
+      print("It is AI-",self.playerName,"'s turn.", self.AIDifficulty, "Diff")
+      possibleMoves = self._getPossibleMoves(othelloBoard,True)
+      if possibleMoves == []: #If there are no possible moves to take, return false. 
+        print("No possible moves to take.")
+        return False
+      if self.AIDifficulty == "e": #Depending on the set AI difficulty, return the move that the methods return or return false if the AIDifficulty is in an invalid state.
+        return self._easyAIMove(possibleMoves)
+      elif self.AIDifficulty == "m":
+        return self._mediumAIMove(othelloBoard,possibleMoves)
+      elif self.AIDifficulty == "h":
+        return self._hardAIMove(othelloBoard,possibleMoves)
+      elif self.AIDifficulty == "vh":
+        return self._veryHardAIMove(othelloBoard,possibleMoves)
+      else:
+        globalfunctions.reportError(0)
+        return False
+    except Exception:
       globalfunctions.reportError(0)
       return False

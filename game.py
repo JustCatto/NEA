@@ -6,6 +6,7 @@ import replit
 import pickle
 import globalfunctions
 import time
+import os
 
 class Game:
   def __init__(self):
@@ -26,10 +27,36 @@ class Game:
     try: #Used to handle the error that is returned when opening a file as x (exclusive creation) if it already exists.
       f = open(file,"x") #Opens the file in mode x (exclusive creation)
       f.close()
-      return False #If there is no error, return false as the file does not exist.
     except FileExistsError:
       return True #If FileExistsError is returned, return true as the file exists.
-    
+    else:
+      os.remove(file)
+      return False #If there is no error, return false as the file does not exist.
+
+  def _getFileName(self,mode): #mode will be False if asking to load a file, or true if asking to save a file.
+    while True:
+      fileName = input("Please input the filename (Type exit to cancel)->")
+      if fileName == "exit":
+        return False
+      if mode == False:
+        if self._checkIfFileExists(fileName) == True:
+          return fileName
+        else:
+          print("File does not exist")
+      elif mode == True:
+        if self._checkIfFileExists(fileName) == False:
+          return fileName
+        else:
+          print("File already exists, would you like to overwrite the file?")
+          while True:
+            choice = input("Y/N\n-->").lower()
+            if choice == "y":
+              return fileName
+            elif choice == "n":
+              print("You have chosen not to overwrite the file.")
+            else:
+              print("Please input either y or n.")
+        
   def _askForPlayerChoice(self,player): #Used to ask the user if the new player should be an AI or a human.
     print("Would you like player ",player,""" to be a player or a human?
           A for AI
@@ -96,11 +123,13 @@ class Game:
       
   def _dealWithSpecialCondition(self,condition): #Method to deal with special conditions such as saving the game, undoing or redoing a move.
     if condition == "s":
-      self._saveGame() #Calls the saveGame method to save the game dictionary before the game ends.
+      fileName = self._getFileName(True)
+      if fileName != False:
+        self._saveGame(fileName) #Calls the saveGame method to save the game dictionary before the game ends.
     elif condition == "r":
-      board.redoMove()  #if the move is redone, the turn is not changed as it will still be the same players turn.
+      self.othelloBoard.redoMove()  #if the move is redone, the turn is not changed as it will still be the same players turn.
     elif condition == "u":
-      status = board.undoMove()
+      status = self.othelloBoard.undoMove()
       if status != False:
         self._setNextMove(status) #If the move is undone, the turn is set to the value of the undone move.
       else:
@@ -175,26 +204,31 @@ class Game:
     self._playGame() #Starts the game
 
   def mainMenu(self): #Prints the main menu for the user and hosts the game itself.
-    while True:
-      print("Othello Game version-",self.Version)
-      print("""
-      ===MAIN MENU===
-      1- New Game
-      2- Load Game
-      3- Exit Game
-      """)
+    try:
       while True:
-        decision = input("Please enter your choice (1,2,3)\n--->") #Accepts the users input for what they want to do.
-        if decision in ["1","2","3"]:
+        print("Othello Game version-",self.Version)
+        print("""
+        ===MAIN MENU===
+        1- New Game
+        2- Load Game
+        3- Exit Game
+        """)
+        while True:
+          decision = input("Please enter your choice (1,2,3)\n--->") #Accepts the users input for what they want to do.
+          if decision in ["1","2","3"]:
+            break
+          else:
+            print("Invalid option, please try again.")
+        if decision == "1": #If it is 1, starts a new game, if 2, loads a game from the existing file, and the 3rd stops the loop.
+          replit.clear()
+          self._newGame()
+        elif decision == "2":
+          replit.clear()
+          fileName = self._getFileName(False)
+          if fileName != False:
+            self._loadGame(fileName)
+        elif decision == "3":
+          print("Exiting game")
           break
-        else:
-          print("Invalid option, please try again.")
-      if decision == "1": #If it is 1, starts a new game, if 2, loads a game from the existing file, and the 3rd stops the loop.
-        replit.clear()
-        self._newGame()
-      elif decision == "2":
-        replit.clear()
-        self._loadGame()
-      elif decision == "3":
-        print("Exiting game")
-        break
+    except Exception:
+      globalfunctions.reportError(0)
