@@ -76,23 +76,30 @@ class Board:
           break
         pieceToCheck = self.othelloBoard[checkY][checkX] #If the coordinates are in range, get the value of the piece at the specified coordinates 
         if pieceToCheck == pieceColor: #If the piece is friendly, ammend this to the flipPieces list.
-          flipPieces.append([checkX][checkY])
+          flipPieces.append([checkX,checkY])
+          overallOffset[0] += offset[0]
+          overallOffset[1] += offset[1] 
         elif pieceToCheck == oppositePieceColor: #If the piece is an enemy piece, remove the last coordinate from the flipPieces list and flip all the pieces to be enemy pieces.
-          flipPieces.pop()
-          for piece in flipPieces: 
-            self.othelloBoard[piece[1]][piece[0]] = oppositePieceColor
+          if len(flipPieces) > 0:
+            flipPieces.pop()
+            for piece in flipPieces: 
+              self.othelloBoard[piece[1]][piece[0]] = oppositePieceColor
           break
         elif pieceToCheck == constants.BLANK: #If the piece is blank, break the loop.
-          break
+          if len(flipPieces) > 0:
+            flipPieces.pop()
+            for piece in flipPieces: 
+              self.othelloBoard[piece[1]][piece[0]] = oppositePieceColor
         else: 
-          pass
+          globalfunctions.reportError(0)
+          return False
     return pieceColor #Once all the directions have been searched, return the original piece color.
 
   def redoMove(self): #Method to redo the last undone move
     Coordinate = self.undoRedoMoves.getRedoMoveCoordinates() #Gets the coordinates from the stack
     if Coordinate != False: #As long as the coordinate is not false, attempt to place the piece as normal and return the original color of that piece.
       self.placePiece(Coordinate[0],Coordinate[1],Coordinate[2])
-      return Coordinate[2]
+      return self._swapColor(Coordinate[2])
     else: #If the coordinate is false, return False and display to the user that there are no moves left to undo.
       print("Unable to redo move, no moves left to redo.")
       return False
@@ -105,3 +112,6 @@ class Board:
 
   def flipNextMove(self):
     self.nextMove = self._swapColor(self.nextMove)
+
+  def getStackContents(self):
+    return self.undoRedoMoves.getStackContents()

@@ -8,7 +8,7 @@ class AI(player.Player): #The player class inherits the player classes methods a
 
   def __init__(self,assignedPiece,AIDifficulty): #When the AI class is initialised, it needs the assigned piece (if it is player 1 or 2) and the difficulty.
     name = random.choice(constants.AINames) #the name of the AI is randomly picked when the class is initialised.
-    super().__init__(name,assignedPiece) #Used to inherit the atributes for the player class.
+    super().__init__(name,assignedPiece,True) #Used to inherit the atributes for the player class.
     self.AIDifficulty = AIDifficulty #Sets the AI difficulty.
 
   def _simulatePlacePiece(self,othelloBoard,x,y,piece): #Method to be used to simulate a piece place that returns the state of the board after the piece is placed.

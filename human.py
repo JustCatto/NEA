@@ -7,7 +7,7 @@ import globalfunctions #Imports all of the functions that are used in all class 
 class Human(player.Player): #This class is used to represent a human player.
   
   def __init__(self,playerName,assignedPiece): #Has two arguments, the players name and the assigned piece for the class.
-    super().__init__(playerName,assignedPiece) #Initialises the inherited values from the player class.
+    super().__init__(playerName,assignedPiece,False) #Initialises the inherited values from the player class.
 
   def _printPossibleMoves(self,moveList): #Used to print off the possible moves for the user.
     print("POSSIBLE MOVES-\n")

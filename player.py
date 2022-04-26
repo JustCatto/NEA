@@ -4,10 +4,14 @@ import globalfunctions
 
 class Player: #The player class, never initialised directly, instead has its methods and atributes inherited into either AI or human. 
               
-  def __init__(self,playerName,assignedPiece): #The only two inputs needed when the class is inherited are the players name, and the assigned piece. 
+  def __init__(self,playerName,assignedPiece,AIStatus): #The only two inputs needed when the class is inherited are the players name, and the assigned piece. 
     self.playerName = playerName
     self.assignedPiece = assignedPiece
+    self.AIStatus = AIStatus
 
+  def getAIStatus(self):
+    return self.AIStatus
+    
   def _printBoard(self,othelloBoard): #Used to print the current state of the board.
     print(" ", end = " ") #Prints a blank space to compensate for the side indicators.
     for x in range(constants.BOARDX):  

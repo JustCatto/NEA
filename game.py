@@ -30,7 +30,7 @@ class Game:
     except FileExistsError:
       return True #If FileExistsError is returned, return true as the file exists.
     else:
-      os.remove(file)
+      os.remove(file) #Since the file doesnt exist and was created, it must be removed to avoid any residual file.
       return False #If there is no error, return false as the file does not exist.
 
   def _getFileName(self,mode): #mode will be False if asking to load a file, or true if asking to save a file.
@@ -97,9 +97,8 @@ class Game:
     else:
       self.player2 = AI.AI(constants.BLACK,self._askForAIDifficulty())
 
-  def _saveGame(self): #Method that gets the user input for the name of the savefile.
+  def _saveGame(self,fileName): #Method that gets the user input for the name of the savefile.
     while True: #Only breaks the loop once the game class has been successfully saved.
-      fileName = input("Please enter a name for your save file.") #Asks for the user input for the files name.
       if self._checkIfFileExists(fileName) == True: #Checks if the file exists, if not just saves the file.
         overwrite = input("Would you like to overwite the file? [Y/N]").lower() #Changes the user input to lowercase and asks if they are sure.
         if overwrite == "y": #if y, overwrite the file.
@@ -126,14 +125,12 @@ class Game:
       fileName = self._getFileName(True)
       if fileName != False:
         self._saveGame(fileName) #Calls the saveGame method to save the game dictionary before the game ends.
-    elif condition == "r":
-      self.othelloBoard.redoMove()  #if the move is redone, the turn is not changed as it will still be the same players turn.
+    elif condition == "r": #if the move is redone, the turn is not changed as it will still be the same players turn.
+      self._setNextMove(self.othelloBoard.redoMove())
     elif condition == "u":
       status = self.othelloBoard.undoMove()
-      if status != False:
-        self._setNextMove(status) #If the move is undone, the turn is set to the value of the undone move.
-      else:
-        pass
+      if status == False: #If the move is undone, the turn does not change.
+        print("No moves left to undo.")
     elif condition == "x":
       print("Game exiting.")
     else: #If none of the conditions are met, return an error to the user.
@@ -154,6 +151,7 @@ class Game:
   def _playGame(self): #The method to play the game until it ends.
     outOfMoves = False #Initialises the variable to indicate if the enemy player does not have any moves.
     while True: #Loop that breaks when the game is over, or if the game is exited or saved.
+      print(self.othelloBoard.getStackContents())
       if self.nextTurn == True: #If the turn is true, it is player 1's turn.
         move = self.player1.getMove(self.othelloBoard.getBoard()) #Gets the move for player 1.
         if move == False: #If the move from player 1 is false, this indicates there are no available moves for them.
@@ -185,8 +183,8 @@ class Game:
           outOfMoves = False
           if move in ["s","u","r"]:
             self._dealWithSpecialCondition(move)
-          if move in ["s","x"]:
-            break
+            if move in ["s","x"]:
+              break
           else:
             self.othelloBoard.placePiece(move[0],move[1],move[2])
             self.nextTurn = True
@@ -204,7 +202,7 @@ class Game:
     self._playGame() #Starts the game
 
   def mainMenu(self): #Prints the main menu for the user and hosts the game itself.
-    try:
+#    try:
       while True:
         print("Othello Game version-",self.Version)
         print("""
@@ -230,5 +228,5 @@ class Game:
         elif decision == "3":
           print("Exiting game")
           break
-    except Exception:
-      globalfunctions.reportError(0)
+#    except Exception:
+#      globalfunctions.reportError(0)
