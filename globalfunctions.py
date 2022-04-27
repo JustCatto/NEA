@@ -2,11 +2,12 @@
 from time import sleep
 import sys
 import constants
-def typing(w): #Might use this but tbh not any of my stuff needs this kind of thing
+def typing(w):
   for i in w:
-    sleep(0.04)
+    sleep(0.01)
     sys.stdout.write(i)
     sys.stdout.flush()
+  print("\n")
 
 def reportError(error):
   try:

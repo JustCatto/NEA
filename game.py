@@ -1,3 +1,4 @@
+from glob import glob
 import AI
 import human
 import board
@@ -10,7 +11,7 @@ import os
 
 class Game:
   def __init__(self):
-    self.Version = 1.4
+    self.Version = "1.4"
 
   def _loadDict(self,fileName): #Method to load and update the class dictionary to start the game again.
     f = open(fileName,"rb") #Opens the file as binary read only mode.
@@ -86,16 +87,16 @@ class Game:
   def _initialisePlayer1(self,humanPlayer): #Initialises the WHITE player/Player 1 class.
     if humanPlayer == True: #If humanplayer is true, ask for the players name and start an instance of the human class assigning it the WHITE piece.
       name = input("Please enter player 1's Name \n--->")
-      self.player1 = human.Human(name,constants.WHITE)
+      self.player1 = human.Human(name,constants.BLACK)
     else: #Otherwise, start an instance of the AI class as the white piece and ask the user for its difficulty. The name is auto generated as the class initialises.
-      self.player1 = AI.AI(constants.WHITE,self._askForAIDifficulty())
+      self.player1 = AI.AI(constants.BLACK,self._askForAIDifficulty())
       
   def _initialisePlayer2(self,humanPlayer): #Does the same as _initialisePlayer1, however instead for player 2.
     if humanPlayer == True:
       name = input("Please enter player 2's Name \n--->")
-      self.player2 = human.Human(name,constants.BLACK)
+      self.player2 = human.Human(name,constants.WHITE)
     else:
-      self.player2 = AI.AI(constants.BLACK,self._askForAIDifficulty())
+      self.player2 = AI.AI(constants.WHITE,self._askForAIDifficulty())
 
   def _saveGame(self,fileName): #Method that gets the user input for the name of the savefile.
     while True: #Only breaks the loop once the game class has been successfully saved.
@@ -173,22 +174,22 @@ class Game:
     whitePieces = self.player1.getTotalPieces(self.othelloBoard.getBoard()) 
     blackPieces = self.player2.getTotalPieces(self.othelloBoard.getBoard())
     if whitePieces > blackPieces: #Whoever has the most pieces is declared the winner.
-      print(constants.winConditions[constants.WHITE])
+      globalfunctions.typing(constants.winConditions[constants.WHITE])
     elif whitePieces == blackPieces:
-      print(constants.winConditions[constants.BLANK])
+      globalfunctions.typing(constants.winConditions[constants.BLANK])
     elif whitePieces < blackPieces:
-      print(constants.winConditions[constants.BLACK])
+      globalfunctions.typing(constants.winConditions[constants.BLACK])
     pass
 
   def _playGame(self): #The method to play the game until it ends.
     outOfMoves = False #Initialises the variable to indicate if the enemy player does not have any moves.
     while True: #Loop that breaks when the game is over, or if the game is exited or saved.
-      print(self.othelloBoard.getStackContents())
+      #print(self.othelloBoard.getStackContents())
       if self.nextTurn == True: #If the turn is true, it is player 1's turn.
         move = self.player1.getMove(self.othelloBoard.getBoard()) #Gets the move for player 1.
         if move == False: #If the move from player 1 is false, this indicates there are no available moves for them.
           if outOfMoves == True: #If outOfMoves is true, this means that the enemy is also out of moves.
-            print("Game Over, Both players have no valid moves remaining.")
+            globalfunctions.typing("Game Over, Both players have no valid moves remaining.")
             self._checkWinner() #This results in the games winner being checked and the loop being broken to end the game.
             break
           outOfMoves = True #If the enemy had moves last turn, indicate that one player is out of moves.
@@ -206,7 +207,7 @@ class Game:
         move = self.player2.getMove(self.othelloBoard.getBoard()) #Same as above except for player 2.
         if move == False:
           if outOfMoves == True:
-            print("Game over, both players have no valid moves remaining.")
+            globalfunctions.typing("Game over, both players have no valid moves remaining.")
             self._checkWinner()
             break
           outOfMoves = True
@@ -222,7 +223,7 @@ class Game:
             self.nextTurn = True
           
   def _newGame(self): #Used to start the game using a blank board.
-    self.nextTurn = True #True for whites move, false for blacks move. This is stored so that when the functions __dict__ is updated, it knows whos turn it should be next.
+    self.nextTurn = True #True for blacks move, false for whites move. This is stored so that when the functions __dict__ is updated, it knows whos turn it should be next.
     self.othelloBoard = board.Board() #Initialises the board class and generates the board.
     self.othelloBoard.generateBoard()
     self._initialisePlayer1(self._askForPlayerChoice("1")) #Initialses both player 1 and 2.
@@ -233,15 +234,37 @@ class Game:
     self._loadDict(fileName) #Updates the class dictionary.
     self._playGame() #Starts the game
 
-  def mainMenu(self): #Prints the main menu for the user and hosts the game itself.
+  def _tutorial(self):
+    globalfunctions.typing("""
+      Welcome to the game of othello.
+      In this game, your objective is to get more friendly pieces on the board than your opponent.
+      You may play against another player, or have an AI of one of four difficulties play against you.
+      Black (X) always moves first in this game.
+      Each turn, you get to place down one piece. 
+      The move is deemed valid if you can 'outflank' at least one enemy piece in a straight line.
+      This means it must be surrounded by 2 friendly pieces in a particular direction.
+      Pieces can be 'captured' if they are outflanked by the opposite piece, however it must be directly surrounded.
+      This means that only pieces that have been surrounded as a result of the newly placed piece can be captured.
+      There can be no cascade captures (Outflanked pieces that are surrounded but not by the piece last placed.)
+      If you do not have any valid moves to make, your turn is forfeited.
+      You cannot however, forfeit your turn if you have a valid move available.
+      Players are also not allowed to skip over their own color disks to outflank an opposing disk.
+      If you wish to learn more about the game, detailed instructions are available at-
+      https://www.worldothello.org/about/about-othello/othello-rules/official-rules/english""")
+    input("Press enter to return to the menu.")
+    replit.clear()   
+
+  
+  def mainMenu(self):
 #    try:
       while True:
-        print("Othello Game version-",self.Version)
+        print(("Othello Game version-",self.Version))
         print("""
         ===MAIN MENU===
         1- New Game
         2- Load Game
-        3- Exit Game
+        3- Game rules
+        4- Exit game
         """)
         while True:
           decision = input("Please enter your choice (1,2,3)\n--->") #Accepts the users input for what they want to do.
@@ -258,7 +281,9 @@ class Game:
           if fileName != False:
             self._loadGame(fileName)
         elif decision == "3":
-          print("Exiting game")
+          self._tutorial()
+        elif decision == "4":
+          globalfunctions.typing("Exiting game")
           break
 #    except Exception:
 #      globalfunctions.reportError(0)
