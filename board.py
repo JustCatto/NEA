@@ -29,11 +29,12 @@ class Board:
         self.piece = self._swapColor(self.piece) 
     self.nextMove = constants.WHITE
 
-  def placePiece(self,x,y,piece): #Method that places down the piece at the specified coordinates and flips any pieces that become directly surrounded by the piece and another friendly piece.
+  def placePiece(self,x,y,piece,logPiece): #Method that places down the piece at the specified coordinates and flips any pieces that become directly surrounded by the piece and another friendly piece.
     offsets = constants.OFFSETS #Loads the offsets from the constants file.
     self.othelloBoard[y][x] = piece #Sets the spot at the specified coordinates to the piece.
     oppositePiece = self._swapColor(piece) #Finds the opposite piece by swapping the color of the originally specified piece.
-    self.undoRedoMoves.pushCoordinates(x,y,piece) #Pushes coordinates to the undoRedoMove stack so then it may be undone.
+    if logPiece == True:
+      self.undoRedoMoves.pushCoordinates(x,y,piece) #Pushes coordinates to the undoRedoMove stack so then it may be undone.
     for offset in offsets: #Cycles through all the offsets.
       flipPieces = [] #Clears the flipPieces list each time to make sure no coordinates are carried over.
       overallOffset = copy.copy(offset) #Takes a copy of the current offset and stores it as the total offset.
@@ -90,6 +91,7 @@ class Board:
             flipPieces.pop()
             for piece in flipPieces: 
               self.othelloBoard[piece[1]][piece[0]] = oppositePieceColor
+          break
         else: 
           globalfunctions.reportError(0)
           return False
@@ -98,10 +100,9 @@ class Board:
   def redoMove(self): #Method to redo the last undone move
     Coordinate = self.undoRedoMoves.getRedoMoveCoordinates() #Gets the coordinates from the stack
     if Coordinate != False: #As long as the coordinate is not false, attempt to place the piece as normal and return the original color of that piece.
-      self.placePiece(Coordinate[0],Coordinate[1],Coordinate[2])
+      self.placePiece(Coordinate[0],Coordinate[1],Coordinate[2],False)
       return self._swapColor(Coordinate[2])
     else: #If the coordinate is false, return False and display to the user that there are no moves left to undo.
-      print("Unable to redo move, no moves left to redo.")
       return False
 
   def getBoard(self):

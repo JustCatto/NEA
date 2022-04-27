@@ -120,17 +120,49 @@ class Game:
       globalfunctions.reportError(0)
       return False
       
-  def _dealWithSpecialCondition(self,condition): #Method to deal with special conditions such as saving the game, undoing or redoing a move.
+  def _dealWithSpecialCondition(self,condition,recall): #Method to deal with special conditions such as saving the game, undoing or redoing a move.
     if condition == "s":
       fileName = self._getFileName(True)
       if fileName != False:
         self._saveGame(fileName) #Calls the saveGame method to save the game dictionary before the game ends.
     elif condition == "r": #if the move is redone, the turn is not changed as it will still be the same players turn.
-      self._setNextMove(self.othelloBoard.redoMove())
+      status = self.othelloBoard.redoMove()
+      if status == False:
+        print("No moves left to redo.")
+      else:
+        self._setNextMove(status)
+        if self.player1.getAIStatus() == True or self.player2.getAIStatus() == True:
+          if recall != True:
+            print("One of the players is an AI. As a result, redoing the last undone move will result in the AI taking a move and overwriting the old moves.")
+            while True:
+              choice = input("Would you like to redo the AI's move also?")
+              if choice == "y":
+                self._dealWithSpecialCondition("r",True)
+                break
+              elif choice == "n":
+                print("Alright, not redoing the AI's move also. (This will result in the other moves being overwritten")
+                break
+              else:
+                print("Please enter either y/n")
     elif condition == "u":
       status = self.othelloBoard.undoMove()
       if status == False: #If the move is undone, the turn does not change.
         print("No moves left to undo.")
+      else:
+        self._setNextMove(status)
+        if self.player1.getAIStatus() == True or self.player2.getAIStatus() == True:
+          if recall != True:
+            print("One of the players is an AI. As a result, undoing the AI's move will result in it taking another move (That will likely be the same)")
+            while True:
+              choice = input("Would you like to undo the move before the AI's move so you make take a turn? [Y/N]").lower()
+              if choice == "y":
+                self._dealWithSpecialCondition("u",True)
+                break
+              elif choice == "n":
+                print("Okay, not undoing another move.")
+                break
+              else:
+                print("Choice must be either y/n.")
     elif condition == "x":
       print("Game exiting.")
     else: #If none of the conditions are met, return an error to the user.
@@ -168,7 +200,7 @@ class Game:
             if move in ["x","s"]: #if the move is to exit or save the game, break the while True loop to end the game.
               break
           else:
-            self.othelloBoard.placePiece(move[0],move[1],move[2]) #If the move is not false or a special condition, attempt to place a piece on the board.
+            self.othelloBoard.placePiece(move[0],move[1],move[2],True) #If the move is not false or a special condition, attempt to place a piece on the board.
             self.nextTurn = False #Set the turn to BLACK.
       elif self.nextTurn == False: #If the turn is False, it is BLACK (player 2's) turn.
         move = self.player2.getMove(self.othelloBoard.getBoard()) #Same as above except for player 2.
@@ -181,12 +213,12 @@ class Game:
           self.nextTurn = True
         else:
           outOfMoves = False
-          if move in ["s","u","r"]:
-            self._dealWithSpecialCondition(move)
+          if move in ["s","u","r","x"]:
+            self._dealWithSpecialCondition(move,False)
             if move in ["s","x"]:
               break
           else:
-            self.othelloBoard.placePiece(move[0],move[1],move[2])
+            self.othelloBoard.placePiece(move[0],move[1],move[2],True)
             self.nextTurn = True
           
   def _newGame(self): #Used to start the game using a blank board.
