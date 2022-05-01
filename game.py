@@ -203,7 +203,7 @@ class Game:
           else:
             self.othelloBoard.placePiece(move[0],move[1],move[2],True) #If the move is not false or a special condition, attempt to place a piece on the board.
             self.nextTurn = False #Set the turn to BLACK.
-      elif self.nextTurn == False: #If the turn is False, it is BLACK (player 2's) turn.
+      elif self.nextTurn == False: #If the turn is False, it is (player 2's) turn.
         move = self.player2.getMove(self.othelloBoard.getBoard()) #Same as above except for player 2.
         if move == False:
           if outOfMoves == True:

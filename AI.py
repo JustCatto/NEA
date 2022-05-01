@@ -42,6 +42,7 @@ class AI(player.Player): #The player class inherits the player classes methods a
 
   def _calculateHeuristic(self,othelloBoard,mode): #Calculates roughly who is winning by reading the boards state. Positive means white is winning, negative means black is winning.
     score = 0 #Score always starts at 0. (Tie)
+    MovesLeft = False
     if mode == False: #If the mode is set to false, do not use the spotValue 2D array and instead add/subtract one whenever either white or black piece is found.
       for x in range(constants.BOARDX):
         for y in range(constants.BOARDY):
@@ -50,6 +51,8 @@ class AI(player.Player): #The player class inherits the player classes methods a
             score += 1
           elif pieceScan == constants.BLACK:
             score -= 1
+          elif pieceScan == constants.BLANK:
+            MovesLeft = True
     elif mode == True: #If the mode is set to true, use the spotValue 2D array and add/subtract the value in the same coordinates as the found piece/
       for x in range(constants.BOARDX):
         for y in range(constants.BOARDY):
@@ -59,7 +62,20 @@ class AI(player.Player): #The player class inherits the player classes methods a
             score += spotValue
           elif pieceScan == constants.BLACK:
             score -= spotValue
+          elif pieceScan == constants.BLANK:
+            MovesLeft == True
     #print(score," Board Score")
+    if MovesLeft == False:
+      if self.getTotalPieces() > 32:
+        if self.assignedPiece == constants.BLACK:
+          score = -constants.INFINITY
+        elif self.assignedPiece == constants.WHITE:
+          score = +constants.INFINITY
+      else:
+        if self.assignedPiece == constants.BLACK:
+          score = +constants.INFINITY
+        elif self.assignedPiece == constants.WHITE:
+          score = -constants.INFINITY
     return score #At the end, once the heuristic of the board has been found, return it.
 
   def _minimax(self,othelloBoard,move,depth,maximising,alpha,beta,mode): #The minimax function that is used to calculate the best possible score the player can achieve in x moves (The depth)
@@ -145,7 +161,7 @@ class AI(player.Player): #The player class inherits the player classes methods a
 
   def getMove(self,othelloBoard): #Called by the game class to get the AIs move based on the difficulty.
     try: 
-      time.sleep(1) #The delay is added to reduce the strain on the machine if two AI's are put against each other.
+      time.sleep(0.5) #The delay is added to reduce the strain on the machine if two AI's are put against each other.
       possibleMoves = []
       self._printBoard(othelloBoard)
       print("It is AI-",self.playerName,"'s turn.", self.AIDifficulty, "Diff")
