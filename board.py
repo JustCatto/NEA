@@ -7,7 +7,6 @@ class Board:
   def __init__(self):
     self.othelloBoard = []
     self.pieceCoordinates = []
-    self.nextMove = constants.BLANK
     self.undoRedoMoves = stack.Stack()
 
   def _swapColor(self,color): #Method that flips the color that is input. For example if black is input, return white, and vice versa.
@@ -27,7 +26,6 @@ class Board:
       for y in range(2):
         self.othelloBoard[y+3][x+3] = self.piece 
         self.piece = self._swapColor(self.piece) 
-    self.nextMove = constants.WHITE
 
   def placePiece(self,x,y,piece,logPiece): #Method that places down the piece at the specified coordinates and flips any pieces that become directly surrounded by the piece and another friendly piece.
     offsets = constants.OFFSETS #Loads the offsets from the constants file.
@@ -107,12 +105,6 @@ class Board:
 
   def getBoard(self):
     return self.othelloBoard
-
-  def getNextMove(self):
-    return self.nextMove
-
-  def flipNextMove(self):
-    self.nextMove = self._swapColor(self.nextMove)
 
   def getStackContents(self):
     return self.undoRedoMoves.getStackContents()
