@@ -66,11 +66,14 @@ class AI(player.Player): #The player class inherits the player classes methods a
             MovesLeft == True
     #print(score," Board Score")
     if MovesLeft == False:
-      if self.getTotalPieces() > 32:
+      totalPieces = self.getTotalPieces(othelloBoard)
+      if totalPieces > 32:
         if self.assignedPiece == constants.BLACK:
           score = -constants.INFINITY
         elif self.assignedPiece == constants.WHITE:
           score = +constants.INFINITY
+      elif totalPieces == 32:
+        score = 0
       else:
         if self.assignedPiece == constants.BLACK:
           score = +constants.INFINITY
@@ -92,23 +95,23 @@ class AI(player.Player): #The player class inherits the player classes methods a
       maxHeuristic = -constants.INFINITY #Set the maximum to negative infinity so that no matter what, the first heuristic returned will always override this as it will always be higher.
       for possibleMove in possibleMoves: #Cycles through all possible moves.
         newBoardCopy = copy.deepcopy(newBoard)
+        if beta <= alpha: #If the beta at any point is lower than the maxHeuristic, stop searching through all the possible moves.
+          break        
         heuristic = self._minimax(newBoardCopy,possibleMove,depth-1,False,alpha,beta,mode) #Call the minimax function again with the possibleMove, passing through all other variables except lowering the depth by one and setting the maximising to False.
         if heuristic > maxHeuristic: #If the heuristic is higher than the maximum, replace the maxheuristic with the heuristic.
           maxHeuristic = copy.copy(heuristic) 
           alpha = max(alpha,maxHeuristic) #Set the alpha to the max of itself and the maxHeuristic
-        if maxHeuristic <= beta: #If the beta at any point is lower than the maxHeuristic, stop searching through all the possible moves.
-          break
       return maxHeuristic
     else: #Otherwise, if maximising is false, search for the lowest heuristic possible out of all possible moves.
       minHeuristic = +constants.INFINITY #Set the minimum to infinity so that no matter what, the first heuristic returned will always override this as it will always be lower.
       for possibleMove in possibleMoves: #Cycles through all possible moves.
+        if beta <= alpha: #If the alpha at any point is higher or equal to the minimum heuristic, stop searching through the possible moves.
+          break
         newBoardCopy = copy.deepcopy(newBoard)
         heuristic = self._minimax(newBoardCopy,possibleMove,depth-1,True,alpha,beta,mode) #Call the minimax function again with the possibleMove, passing through all other variables except lowering the depth by one and setting the maximising to True.
         if heuristic < minHeuristic: #if the heuristic found less than minHeuristic, replace it with the heuristic.
           minHeuristic = copy.copy(heuristic)
           beta = min(beta,minHeuristic) #Set the beta to be the minimum of either itself or the minimum heuristic.
-        if minHeuristic <= alpha: #If the alpha at any point is higher or equal to the minimum heuristic, stop searching through the possible moves.
-          break
       return minHeuristic #Once all moves have been searched return the minimum heuristic.
 
   def _minimaxInitialCall(self,board,possibleMoves,mode): #Used to initially call the minimax function with the first set of moves. 
@@ -160,7 +163,7 @@ class AI(player.Player): #The player class inherits the player classes methods a
     return self._minimaxInitialCall(othelloBoard,possibleMoves,True) #Calls the minimax function with the weighted board score heuristic.
 
   def getMove(self,othelloBoard): #Called by the game class to get the AIs move based on the difficulty.
-    try: 
+    #try: 
       time.sleep(0.5) #The delay is added to reduce the strain on the machine if two AI's are put against each other.
       possibleMoves = []
       self._printBoard(othelloBoard)
@@ -180,6 +183,6 @@ class AI(player.Player): #The player class inherits the player classes methods a
       else:
         globalfunctions.reportError(0)
         return False
-    except Exception:
-      globalfunctions.reportError(0)
-      return False
+    #except Exception:
+    #  globalfunctions.reportError(0)
+    #  return False
