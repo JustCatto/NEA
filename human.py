@@ -84,6 +84,8 @@ class Human(player.Player): #This class is used to represent a human player.
           print("Warining- You do not have any possible moves. By confirming, you will have your turn skipped.")
         if self._confirmDecision() == True:
           return self._getCoordinates(othelloBoard,possibleMoves) #Calls the private method to get the user coordinates using the board and possible moves.
-          
+      else:
+        globalfunctions.reportError(0)
+        return False
       
         

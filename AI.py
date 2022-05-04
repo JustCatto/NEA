@@ -165,7 +165,7 @@ class AI(player.Player): #The player class inherits the player classes methods a
     return self._minimaxInitialCall(othelloBoard,possibleMoves,True) #Calls the minimax function with the weighted board score heuristic.
 
   def getMove(self,othelloBoard): #Called by the game class to get the AIs move based on the difficulty.
-    #try: 
+    try: 
       time.sleep(0.5) #The delay is added to reduce the strain on the machine if two AI's are put against each other.
       possibleMoves = []
       self._printBoard(othelloBoard)
@@ -185,6 +185,6 @@ class AI(player.Player): #The player class inherits the player classes methods a
       else:
         globalfunctions.reportError(0)
         return False
-    #except Exception:
-    #  globalfunctions.reportError(0)
-    #  return False
+    except Exception:
+      globalfunctions.reportError(0)
+      return False

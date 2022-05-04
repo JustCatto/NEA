@@ -1,4 +1,3 @@
-from glob import glob
 import AI
 import human
 import board
@@ -256,7 +255,7 @@ class Game:
 
   
   def mainMenu(self):
-#    try:
+    try:
       while True:
         print(("Othello Game version-",self.Version))
         print("""
@@ -285,5 +284,5 @@ class Game:
         elif decision == "4":
           globalfunctions.typing("Exiting game")
           break
-#    except Exception:
-#      globalfunctions.reportError(0)
+    except Exception:
+      globalfunctions.reportError(0)
