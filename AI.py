@@ -96,22 +96,24 @@ class AI(player.Player): #The player class inherits the player classes methods a
       for possibleMove in possibleMoves: #Cycles through all possible moves.
         newBoardCopy = copy.deepcopy(newBoard)
         if beta <= alpha: #If the beta at any point is lower than the maxHeuristic, stop searching through all the possible moves.
+          #print("Tree cutoff, beta less than alpha",beta,alpha)
           break        
         heuristic = self._minimax(newBoardCopy,possibleMove,depth-1,False,alpha,beta,mode) #Call the minimax function again with the possibleMove, passing through all other variables except lowering the depth by one and setting the maximising to False.
+        alpha = max(alpha,heuristic) #Set the alpha to the max of itself and the maxHeuristic
         if heuristic > maxHeuristic: #If the heuristic is higher than the maximum, replace the maxheuristic with the heuristic.
           maxHeuristic = copy.copy(heuristic) 
-          alpha = max(alpha,maxHeuristic) #Set the alpha to the max of itself and the maxHeuristic
       return maxHeuristic
     else: #Otherwise, if maximising is false, search for the lowest heuristic possible out of all possible moves.
       minHeuristic = +constants.INFINITY #Set the minimum to infinity so that no matter what, the first heuristic returned will always override this as it will always be lower.
       for possibleMove in possibleMoves: #Cycles through all possible moves.
         if beta <= alpha: #If the alpha at any point is higher or equal to the minimum heuristic, stop searching through the possible moves.
+          #print("Tree cutoff, beta less than alpha",beta,alpha)
           break
         newBoardCopy = copy.deepcopy(newBoard)
         heuristic = self._minimax(newBoardCopy,possibleMove,depth-1,True,alpha,beta,mode) #Call the minimax function again with the possibleMove, passing through all other variables except lowering the depth by one and setting the maximising to True.
+        beta = min(beta,heuristic) #Set the beta to be the minimum of either itself or the minimum heuristic.
         if heuristic < minHeuristic: #if the heuristic found less than minHeuristic, replace it with the heuristic.
           minHeuristic = copy.copy(heuristic)
-          beta = min(beta,minHeuristic) #Set the beta to be the minimum of either itself or the minimum heuristic.
       return minHeuristic #Once all moves have been searched return the minimum heuristic.
 
   def _minimaxInitialCall(self,board,possibleMoves,mode): #Used to initially call the minimax function with the first set of moves. 
