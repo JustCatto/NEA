@@ -6,7 +6,6 @@ import globalfunctions
 class Board:
   def __init__(self):
     self.othelloBoard = []
-    self.pieceCoordinates = []
     self.undoRedoMoves = stack.Stack()
 
   def _swapColor(self,color): #Method that flips the color that is input. For example if black is input, return white, and vice versa.
