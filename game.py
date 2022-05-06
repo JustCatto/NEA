@@ -185,6 +185,7 @@ class Game:
       #print(self.othelloBoard.getStackContents())
       if self.nextTurn == True: #If the turn is true, it is player 1's turn.
         move = self.player1.getMove(self.othelloBoard.getBoard()) #Gets the move for player 1.
+        print(move)
         if move == False: #If the move from player 1 is false, this indicates there are no available moves for them.
           if outOfMoves == True: #If outOfMoves is true, this means that the enemy is also out of moves.
             globalfunctions.typing("Game Over, Both players have no valid moves remaining.")
@@ -203,6 +204,7 @@ class Game:
             self.nextTurn = False #Set the turn to BLACK.
       elif self.nextTurn == False: #If the turn is False, it is (player 2's) turn.
         move = self.player2.getMove(self.othelloBoard.getBoard()) #Same as above except for player 2.
+        print(move)
         if move == False:
           if outOfMoves == True:
             globalfunctions.typing("Game over, both players have no valid moves remaining.")
@@ -250,8 +252,8 @@ class Game:
         4- Exit game
         """)
         while True:
-          decision = input("Please enter your choice (1,2,3)\n--->") #Accepts the users input for what they want to do.
-          if decision in ["1","2","3"]:
+          decision = input("Please enter your choice (1,2,3,4)\n--->") #Accepts the users input for what they want to do.
+          if decision in ["1","2","3","4"]:
             break
           else:
             print("Invalid option, please try again.")

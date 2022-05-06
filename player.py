@@ -48,13 +48,8 @@ class Player: #The player class, never initialised directly, instead has its met
       globalfunctions.reportError(0) #If the method was called erroniously, and is neither white or black, a general error is returned to the user to alert them of this.
       return False
 
-  def _getPossibleMoves(self,othelloBoard,Friendly): #Gets all of the possible moves of one specific color.
-    if Friendly == True: #If the getPossibleMoves method is searching for all possible friendly moves, the piece to be used is the assigned piece.
-      piece = self.assignedPiece
-      oppositePiece = self._swapColor(self.assignedPiece)
-    else: #If it is searching for all possible enemy moves, the piece to be used is the enemy piece, or the assignedPiece passed through the swapColor method.
-      piece = self._swapColor(self.assignedPiece) 
-      oppositePiece = self.assignedPiece
+  def _getPossibleMoves(self,othelloBoard,piece): #Gets all of the possible moves of one specific color.
+    oppositePiece = self._swapColor(piece)
     offsets = constants.OFFSETS #Loads up the offsets from the constants file.
     possibleMoves = [] #Initialises the possibleMoves list so that it can be appended to.
     pieceCoordinates = self._findPiece(othelloBoard,piece) #Finds all of the pieces of the one specific color.

@@ -84,11 +84,11 @@ class AI(player.Player): #The player class inherits the player classes methods a
   def _minimax(self,othelloBoard,move,depth,maximising,alpha,beta,mode): #The minimax function that is used to calculate the best possible score the player can achieve in x moves (The depth)
     #print(alpha,beta)
     if maximising == True:
-      color = self.assignedPiece
+      color = constants.BLACK
     else:
-      color = self._swapColor(self.assignedPiece)
+      color = constants.WHITE
     newBoard = self._simulatePlacePiece(othelloBoard,move[0],move[1],color) #Simulates the piece being placed on a board.
-    possibleMoves = self._getPossibleMoves(newBoard,maximising) #Gets the new possible moves after the piece has been simulated being placed on the board.
+    possibleMoves = self._getPossibleMoves(newBoard,color) #Gets the new possible moves after the piece has been simulated being placed on the board.
     if depth == 0 or possibleMoves == []: #If the depth is 0 or there are no possible moves remaining, calculate the heuristic of the board and stop searching downward.
       return self._calculateHeuristic(newBoard,mode)
     if maximising == True: #If maximising is true, search for the highest heuristic possible out of all possible moves.
@@ -117,16 +117,29 @@ class AI(player.Player): #The player class inherits the player classes methods a
       return minHeuristic #Once all moves have been searched return the minimum heuristic.
 
   def _minimaxInitialCall(self,board,possibleMoves,mode): #Used to initially call the minimax function with the first set of moves. 
+    if self.assignedPiece == constants.BLACK:
+      maximising = True
+    else:
+      maximising = False
     optimalMove = []
-    minHeuristic = -constants.INFINITY #Initialises the minHeuristic variable as -infinity so that the first heuristic that the board returns will always override the minimum.
+    maxHeuristic = -constants.INFINITY
+    minHeuristic = +constants.INFINITY #Initialises the minHeuristic variable as -infinity so that the first heuristic that the board returns will always override the minimum.
     for possibleMove in possibleMoves: #Cycles through all the possible moves.
       boardCopy = copy.deepcopy(board)
-      heuristic = self._minimax(boardCopy,possibleMove,4,True,-constants.INFINITY,constants.INFINITY,mode) #Initially calls the minimax method for each possible move.
-      if heuristic > minHeuristic: #If the heuristic returned by the minimax function is higher than the minimum, set the minimum to the current moves heuristic, and the optimal move to the possibleMove.
-        minHeuristic = copy.copy(heuristic)
-        optimalMove = copy.copy(possibleMove)
-      elif heuristic == minHeuristic and random.randint(0,1) == 1:
-        optimalMove = copy.copy(possibleMove)
+      heuristic = self._minimax(boardCopy,possibleMove,4,maximising,-constants.INFINITY,constants.INFINITY,mode) #Initially calls the minimax method for each possible move.
+      if maximising == True:
+        if heuristic > maxHeuristic: #If the heuristic returned by the minimax function is higher than the minimum, set the minimum to the current moves heuristic, and the optimal move to the possibleMove.
+          maxHeuristic = copy.copy(heuristic)
+          optimalMove = copy.copy(possibleMove)
+        elif heuristic == maxHeuristic and random.randint(0,1) == 1:
+          optimalMove = copy.copy(possibleMove)
+      elif maximising == False:
+        if heuristic < minHeuristic:
+          minHeuristic = copy.copy(heuristic)
+          optimalMove = copy.copy(possibleMove)
+        elif heuristic == minHeuristic and random.randint(0,1) == 0:
+          optimalMove = copy.copy(possibleMove)
+
     optimalMove.append(self.assignedPiece)
     return optimalMove #Once all possible moves have been checked, return the optimalMove.
     
@@ -170,7 +183,7 @@ class AI(player.Player): #The player class inherits the player classes methods a
       possibleMoves = []
       self._printBoard(othelloBoard)
       print("It is AI-",self.playerName,"'s turn.", self.AIDifficulty, "Diff")
-      possibleMoves = self._getPossibleMoves(othelloBoard,True)
+      possibleMoves = self._getPossibleMoves(othelloBoard,self.assignedPiece)
       if possibleMoves == []: #If there are no possible moves to take, return false. 
         print("No possible moves to take.")
         return False

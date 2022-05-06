@@ -51,7 +51,7 @@ class Human(player.Player): #This class is used to represent a human player.
           time.sleep(1.5)
         
   def getMove(self,othelloBoard): 
-    possibleMoves = self._getPossibleMoves(othelloBoard,True) #Gets the possible moves for the current board state.
+    possibleMoves = self._getPossibleMoves(othelloBoard,self.assignedPiece) #Gets the possible moves for the current board state.
     while True: #If there are possible moves, ask for the users input.
       print("It is",self.playerName,"'s turn.'")
       self._printBoard(othelloBoard) #Prints out the board and the possible coordinates for the user.
